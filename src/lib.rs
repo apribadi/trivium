@@ -10,15 +10,17 @@ fn get<const N: usize>(x: [u64; 2]) -> u64 {
 }
 
 impl Trivium64 {
-  pub fn initialize(key: [u8; 10], iv: [u8; 10]) -> Self {
-    let mut x = [ 0, 0 ];
-    let mut y = [ 0, 0 ];
-    let     z = [ 0, 0x0000_7000_0000_0000 ];
+  pub fn new(key: [u8; 10], iv: [u8; 10]) -> Self {
+    let x0 = u64::from_le_bytes(key[0 .. 8].try_into().unwrap());
+    let x1 = u16::from_le_bytes(key[8 .. 10].try_into().unwrap()) as u64;
+    let y0 = u64::from_le_bytes(iv[0 .. 8].try_into().unwrap());
+    let y1 = u16::from_le_bytes(iv[8 .. 10].try_into().unwrap()) as u64;
+    let z0 = 0;
+    let z1 = 0x0000_7000_0000_0000;
 
-    for i in 0 .. 8 { x[0] = x[0] | ((key[i + 0] as u64) << i); }
-    for i in 0 .. 2 { x[1] = x[1] | ((key[i + 8] as u64) << i); }
-    for i in 0 .. 8 { y[0] = y[0] | (( iv[i + 0] as u64) << i); }
-    for i in 0 .. 2 { y[1] = y[1] | (( iv[i + 8] as u64) << i); }
+    let x = [ x0, x1 ];
+    let y = [ y0, y1 ];
+    let z = [ z0, z1 ];
 
     let mut t = Self { x, y, z };
     for _ in 0 .. 18 { let _: u64 = t.next(); }
@@ -33,8 +35,8 @@ impl Trivium64 {
     let b = get::<69>(y) ^ get::<84>(y);
     let c = get::<66>(z) ^ get::<111>(z);
     self.x = [ c ^ (get::<109>(z) & get::<110>(z)) ^ get::<69>(x), x[0] ];
-    self.y = [ a ^ (get::< 91>(x) & get::< 92>(x)) ^ get::<78>(y), y[0] ];
-    self.z = [ b ^ (get::< 82>(y) & get::< 83>(y)) ^ get::<87>(z), z[0] ];
+    self.y = [ a ^ (get::<91>(x) & get::<92>(x)) ^ get::<78>(y), y[0] ];
+    self.z = [ b ^ (get::<82>(y) & get::<83>(y)) ^ get::<87>(z), z[0] ];
     a ^ b ^ c
   }
 }
