@@ -1,13 +1,12 @@
 [package]
-name = "trivium"
+name = "trivium-random"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
-[profile.release]
-opt-level = 2
-# rustflags = [ "-C", "no-vectorize-loops", "-C", "no-vectorize-slp" ]
+[lib]
+name = "trivium"
 
 [dependencies]
 
 [dev-dependencies]
-expect-test = "1.4.0"
+expect-test = "1.5.1"
